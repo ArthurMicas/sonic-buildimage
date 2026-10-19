@@ -509,7 +509,7 @@ class MicasCpo(CpoBase, SfpOptoeBase):
                 if current is None or power_mw is None:
                     self._cpolog(LOG_ERROR_LEVEL, "ELS laser {} monitor unavailable: {}".format(laser, self._port_id))
                     continue
-                current_ma = round(current, 3)
+                current_ma = round(api.amps_to_ma(current), 3)
                 power_dbm = XcvrApi.mw_to_dbm(power_mw)
                 info["RLM{}_Laser{}_current".format(self._els_id, laser)] = "{} mA".format(current_ma)
                 info["RLM{}_Laser{}_power".format(self._els_id, laser)] = "%.03f dBm" % power_dbm

@@ -77,7 +77,7 @@ class TestBaillyCpoFactory(unittest.TestCase):
         api = oe.get_api()
         self.assertIsInstance(api, BaillyOeApi)
         self.assertEqual(api.xcvr_eeprom.mem_map.bank, 7)
-        self.assertNotIn(0xB4, [page.page for page in api.xcvr_eeprom.mem_map.pages])
+        self.assertIn(0xB4, [page.page for page in api.xcvr_eeprom.mem_map.pages])
         field = api.xcvr_eeprom.mem_map.get_field(consts.TX_DISABLE_FIELD)
         other = BaillyMemoryOe(bank=0, base_page=4).get_api().xcvr_eeprom.mem_map.get_field(consts.TX_DISABLE_FIELD)
         self.assertNotEqual(field.get_offset(), other.get_offset())
