@@ -305,8 +305,15 @@ class TestCpoInitialization(unittest.TestCase):
         api.tx_disable.assert_called_once_with(True)
         self.assertEqual(cpo.bank, 7)
         self.assertEqual((self.directory / "max_bank_size").read_text(), "8")
-        with self.assertRaises(NotImplementedError):
-            oe.set_lpmode(True)
+        with patch.object(els, "get_api", side_effect=AssertionError("ELS control used")):
+            self.assertTrue(oe.set_lpmode(False))
+            self.assertTrue(oe.reset())
+            api.set_lpmode.return_value = False
+            api.reset.return_value = False
+            self.assertFalse(oe.set_lpmode(True))
+            self.assertFalse(oe.reset())
+        self.assertEqual([call.args for call in api.set_lpmode.call_args_list], [(True,), (False,), (True,)])
+        self.assertEqual(api.reset.call_count, 3)
         with self.assertRaises(NotImplementedError):
             els.reset()
 

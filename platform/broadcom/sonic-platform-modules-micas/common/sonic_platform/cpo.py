@@ -297,6 +297,12 @@ class MicasOe(OptoeOeBase):
     def get_eeprom_path(self) -> str:
         return self._eeprom_path
 
+    def set_lpmode(self, lpmode):
+        return self.get_api().set_lpmode(lpmode)
+
+    def reset(self):
+        return self.get_api().reset()
+
     def get_name(self):
         return "OE{}".format(self.oe_id)
 
