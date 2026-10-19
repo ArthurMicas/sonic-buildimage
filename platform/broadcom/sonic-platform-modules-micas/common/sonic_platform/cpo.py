@@ -19,7 +19,6 @@
 
 try:
     import logging
-    import math
     import os
     from logging.handlers import RotatingFileHandler
     # BEGIN LEGACY imports for former port adapters - reference only; not executed
@@ -37,6 +36,7 @@ try:
     from sonic_platform_base.sonic_xcvr.cpo.cpo_optoe_base import OptoeOeBase, OptoeElsfpBase
     from sonic_platform_base.sonic_xcvr.sfp_optoe_base import SfpOptoeBase
     from sonic_platform_base.sonic_xcvr.fields import elsfp_consts
+    from sonic_platform_base.sonic_xcvr.api.xcvr_api import XcvrApi
 except ImportError as error:
     raise ImportError(str(error) + "- required module not found") from error
 
@@ -509,11 +509,10 @@ class MicasCpo(CpoBase, SfpOptoeBase):
                 if current is None or power_mw is None:
                     self._cpolog(LOG_ERROR_LEVEL, "ELS laser {} monitor unavailable: {}".format(laser, self._port_id))
                     continue
-                # Public ELS bias is in A; the existing platform display uses mA.
-                current_ma = round(api.amps_to_ma(current), 3)
-                power_dbm = 10 * math.log10(power_mw) if power_mw > 0 else -40
+                current_ma = round(current, 3)
+                power_dbm = XcvrApi.mw_to_dbm(power_mw)
                 info["RLM{}_Laser{}_current".format(self._els_id, laser)] = "{} mA".format(current_ma)
-                info["RLM{}_Laser{}_power".format(self._els_id, laser)] = "%.03f mW %.03f dBm" % (power_mw, power_dbm)
+                info["RLM{}_Laser{}_power".format(self._els_id, laser)] = "%.03f dBm" % power_dbm
         except Exception as exc:
             self._cpolog(LOG_ERROR_LEVEL, "get ELS laser monitors failed: {}: {}".format(self._port_id, exc))
 

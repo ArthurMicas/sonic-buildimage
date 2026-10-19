@@ -383,11 +383,10 @@ class TestCpoInitialization(unittest.TestCase):
         els_api.get_non_banked_elsfp_dom_real_value.return_value = {
             "temperature": 25.5, "voltage": 3.3, "tec_current": 1.0}
         els_api.get_per_lane_bias_current_monitor.return_value = {
-            "BiasCurrentMonitor{}".format(i + 1): i / 1000.0 for i in range(8)}
-        els_api.get_per_lane_bias_current_monitor.return_value["BiasCurrentMonitor6"] = 0.10001
+            "BiasCurrentMonitor{}".format(i + 1): float(i) for i in range(8)}
+        els_api.get_per_lane_bias_current_monitor.return_value["BiasCurrentMonitor6"] = 100.01
         els_api.get_per_lane_opt_power_monitor.return_value = {
             "OptPowerMonitor{}".format(i + 1): 1.0 for i in range(8)}
-        els_api.amps_to_ma.side_effect = lambda value: value * 1000.0
         oe._api, els._api = api, els_api
         cpo = self.cpo.MicasCpo(1, "Ethernet0", oe, els, laser_ids=[4, 5])
         dom = cpo.get_transceiver_dom_real_value()
@@ -397,7 +396,7 @@ class TestCpoInitialization(unittest.TestCase):
         self.assertEqual(dom["rlm_tec_current"], 1.0)
         self.assertEqual(dom["RLM1_Laser4_current"], "4.0 mA")
         self.assertEqual(dom["RLM1_Laser5_current"], "100.01 mA")
-        self.assertEqual(dom["RLM1_Laser5_power"], "1.000 mW 0.000 dBm")
+        self.assertEqual(dom["RLM1_Laser5_power"], "0.000 dBm")
         self.assertNotIn("RLM1_Laser0_current", dom)
         els_api.get_non_banked_elsfp_dom_real_value.assert_called_once_with()
         els_api.get_per_lane_bias_current_monitor.assert_called_once_with()
